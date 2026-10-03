@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 SERVER = 'localhost'
 PORT = 1947
@@ -10,6 +11,7 @@ def broadcast(message, sender_socket=None):
         if client_socket != sender_socket:
             try:
                 client_socket.sendall(message.encode('utf-8'))
+                
             except:
                 remove_client(client_socket)
 
@@ -17,10 +19,12 @@ def handle_client(client_socket):
     try:
         username = client_socket.recv(1024).decode('utf-8')
         clients[client_socket] = username
-        
-        welcome_msg = f"--- {username} has joined the chat! ---"
+
+        time_stamp= time.strftime("%I:%M %p", time.localtime())
+        welcome_msg = f"[{time_stamp}]--- {username} has joined the chat! ---"
         print(welcome_msg)
-        broadcast(welcome_msg, client_socket)
+
+        broadcast((welcome_msg), client_socket)
 
         while True:
             message = client_socket.recv(1024).decode('utf-8')
@@ -34,7 +38,8 @@ def handle_client(client_socket):
                 client_socket.sendall(f"Active users: {active_users}".encode('utf-8'))
             
             else:
-                formatted_msg = f"{username}: {message}"
+                time_stamp= time.strftime("%I:%M %p", time.localtime())
+                formatted_msg = f"[{time_stamp}] {username}: {message}"
                 print(formatted_msg)
                 broadcast(formatted_msg, client_socket)
                 
@@ -46,8 +51,9 @@ def remove_client(client_socket):
         username = clients[client_socket]
         del clients[client_socket]
         client_socket.close()
-            
-        leave_message = f"--- {username} has left the chat ---"
+
+        time_stamp= time.strftime("%I:%M %p", time.localtime())
+        leave_message = f"[{time_stamp}]--- {username} has left the chat ---"
         print(leave_message)
         broadcast(leave_message)
 
