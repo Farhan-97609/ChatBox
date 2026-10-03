@@ -1,6 +1,7 @@
 import socket
 import sys
 import threading
+import time
 
 SERVER = 'localhost'
 PORT = 1947
@@ -13,6 +14,7 @@ def receive_messages(client_socket):
                 break
             print(f"\r{message}")
             print("You: ", end="", flush=True)
+            
         except:
             print("\nDisconnected from the server.")
             client_socket.close()
@@ -28,16 +30,18 @@ except:
 print("---Welcome to the chat---")
 username = input("Enter your Username: ")
 client.send(username.encode('utf-8'))
-print("-----------------------------------------")
 print("Enter /quit to exit the chat")
 print("Enter /list to show all connected users.\n")
-print("-----------------------------------------")
+
 receive_thread = threading.Thread(target=receive_messages, args=(client,))
 receive_thread.start()
 
 while True:
     try:
-        message = input("You: ")
+        message = input("You: ")  
+        timestamp = time.strftime('%I:%M %p', time.localtime())
+        print("\033[1A\033[2K", end="")
+        print(f"[{timestamp}] You: {message}") 
         client.send(message.encode('utf-8'))
         
         if message == '/quit':
