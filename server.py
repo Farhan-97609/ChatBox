@@ -21,6 +21,13 @@ def broadcast(message, sender_socket=None):
 def handle_client(client_socket):
     try:
         username = cipher.decrypt(client_socket.recv(1024)).decode('utf-8')
+
+        if username in clients.values():
+            error_msg= "Username already taken!!... Try with a different username"
+            client_socket.sendall(cipher.encrypt(error_msg.encode()))
+            client_socket.close()
+            return
+
         clients[client_socket] = username
 
         time_stamp= time.strftime("%I:%M %p", time.localtime())
