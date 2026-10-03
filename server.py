@@ -35,6 +35,31 @@ def handle_client(client_socket):
             if not message or message == '/quit':
                 remove_client(client_socket)
                 break
+            elif message.startswith('@'):
+                parts = message[1:].split(' ', 1)
+                if len(parts) == 2:
+                    target_name = parts[0]
+                    private_msg = parts[1]
+                    target_socket = None
+                    
+                    for sock, name in clients.items():
+                        if name == target_name:
+                            target_socket = sock
+                            break
+                            
+                    if target_socket:
+                        time_stamp = time.strftime("%I:%M %p", time.localtime())
+                        target_message = f"[{time_stamp}] [Private from {username}]: {private_msg}"
+                        target_socket.sendall(cipher.encrypt(target_message.encode('utf-8')))
+
+                        sender_message = f"[{time_stamp}] [Private to {target_name}]: {private_msg}"
+                        client_socket.sendall(cipher.encrypt(sender_message.encode('utf-8')))
+                    else:
+                        error_msg = f"User '{target_name}' is not in the chat."
+                        client_socket.sendall(cipher.encrypt(error_msg.encode('utf-8')))
+                else:
+                    error_msg = "Correct format: @username your message"
+                    client_socket.sendall(cipher.encrypt(error_msg.encode('utf-8')))
 
             elif message == '/list':
                 active_users = ", ".join(clients.values())
