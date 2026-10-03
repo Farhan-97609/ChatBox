@@ -33,8 +33,12 @@ except:
 print("---Welcome to the chat---")
 username = input("Enter your Username: ")
 client.sendall(cipher.encrypt(username.encode('utf-8')))
+print("\n---------------------------------------------------------------------")
 print("Enter /quit to exit the chat")
-print("Enter /list to show all connected users.\n")
+print("Enter /list to show all connected users.")
+print("---------------------------------------------------------------------")
+print("For sending private message write \"@username\" before your message.")
+print("---------------------------------------------------------------------")
 
 receive_thread = threading.Thread(target=receive_messages, args=(client,))
 receive_thread.start()
